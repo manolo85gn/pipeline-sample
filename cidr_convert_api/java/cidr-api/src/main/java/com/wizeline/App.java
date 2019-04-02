@@ -13,7 +13,7 @@ public class App {
       get("/_health", App::routeRoot);
       get("/cidr-to-mask", App::routeCidrToMask, json());
       get("/mask-to-cidr", App::routeMaskToCidr, json());
-      get("/ip-validation", App::routeMaskToCidr, json());
+      get("/ip-validation", App::routeIpv4Validation, json());
     }
 
     public static Object routeRoot(spark.Request req, spark.Response res) throws Exception {
