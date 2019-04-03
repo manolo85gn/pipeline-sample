@@ -1,7 +1,5 @@
 package com.wizeline;
 import static com.wizeline.JsonUtil.*;
-import static com.wizeline.Convert.*;
-import static com.wizeline.Response.*;
 import static spark.Spark.*;
 
 public class App {

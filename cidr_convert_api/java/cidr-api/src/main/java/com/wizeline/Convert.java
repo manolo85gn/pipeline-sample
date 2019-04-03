@@ -4,15 +4,59 @@ import java.util.StringJoiner;
 
 public class Convert {
 
-  public static String cidrToMask(String input) {
+  /**
+   * Method to calculate the mask by the cidr
+   * @param cidr e.g. 24
+   * @return
+   */
+  public static String cidrToMask(String cidr) {
 
-    if( !cidrValidation(input) ) {
+    if(cidr == null || !cidrValidation(cidr) ) {
       return "Invalid";
     }
 
-    String plainMask = generatePlainMask(input);
+    String plainMask = generatePlainMask(cidr);
     String[] tokens = plainMaskToTokens(plainMask);
     return maskTokensToString(tokens);
+  }
+
+  /**
+   * Method to calculate the cidr by the mask
+   *
+   * @param mask e.g. 255.0.0.0
+   * @return cidr
+   */
+  public static String maskToCidr(String mask) {
+
+    if(mask == null || !maskValidation(mask)) {
+      return "Invalid";
+    }
+
+    return calculateCidr(mask).toString();
+  }
+
+  /**
+   * IP validation
+   *
+   * @param ip e.g. 198.12.1.1
+   * @return
+   */
+  public static Boolean ipv4Validation(String ip) {
+
+    String[] tokens = ip != null ? ip.split("\\.") : null;
+    if (tokens == null || tokens.length != 4) {
+      return false;
+    }
+
+    boolean result = true;
+    for (int i = 0; i < tokens.length; i++) {
+      result = result && integerValidation(tokens[i]) && rangeValidation(tokens[i]);
+      if(!result) {
+        break;
+      }
+    }
+
+    return result;
   }
 
   private static String generatePlainMask(String input) {
@@ -47,15 +91,6 @@ public class Convert {
     return joiner.toString();
   }
 
-  public static String maskToCidr(String input) {
-
-    if(!maskValidation(input)) {
-      return "Invalid";
-    }
-
-    return calculateCidr(input).toString();
-  }
-
   private static Integer calculateCidr(String input) {
     String[] maskTokens = input.split("\\.");
     Integer cidr = 0;
@@ -74,24 +109,6 @@ public class Convert {
       }
     }
     return count;
-  }
-
-  public static Boolean ipv4Validation(String x) {
-
-    String[] tokens = x.split("\\.");
-    if (tokens.length != 4) {
-      return false;
-    }
-
-    boolean result = true;
-    for (int i = 0; i < tokens.length; i++) {
-      result = result && integerValidation(tokens[i]) && rangeValidation(tokens[i]);
-      if(!result) {
-        break;
-      }
-    }
-
-    return result;
   }
 
   private static Boolean rangeValidation(String token) {
