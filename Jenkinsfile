@@ -32,8 +32,6 @@ def getDockerData = {
 }
 
 node {
-<<<<<<< HEAD
-=======
   withCredentials([string(credentialsId: 'webhookTokenWizeline', variable: 'webhookTokenWizeline')]) {
     properties([
       pipelineTriggers([
@@ -60,7 +58,6 @@ node {
     ])
   }
 
->>>>>>> feature/jenkinsjob
   stage("Checkout") {
     checkout scm
   }
