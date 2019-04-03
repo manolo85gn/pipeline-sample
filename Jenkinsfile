@@ -38,7 +38,6 @@ node {
 
   stage("Test") {
     dir('cidr_convert_api/java') {
-      echo "test is working"
       sh 'docker run -v $(pwd)/cidr-api:/usr/local/cidr-api -w /usr/local/cidr-api maven:3-jdk-8-alpine mvn test'
     }
   }
