@@ -23,9 +23,8 @@ def getDockerData = {
       namespace = "production"
       break
     default:
-      version = "${env.BRANCH_NAME.replaceAll("/", "_") {(?1: )match(?1: ->)
-
-      }}-${env.BUILD_NUMBER}"
+      def branchName = env.BRANCH_NAME.replaceAll("/", "_")
+      version = "${branchName}-${env.BUILD_NUMBER}"
       break
   }
 
