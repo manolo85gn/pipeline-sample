@@ -6,7 +6,7 @@ public class Convert {
 
   /**
    * Method to calculate the mask by the cidr
-   * @param cidr
+   * @param cidr e.g. 24
    * @return
    */
   public static String cidrToMask(String cidr) {
@@ -23,7 +23,7 @@ public class Convert {
   /**
    * Method to calculate the cidr by the mask
    *
-   * @param mask
+   * @param mask e.g. 255.0.0.0
    * @return cidr
    */
   public static String maskToCidr(String mask) {
@@ -35,6 +35,12 @@ public class Convert {
     return calculateCidr(mask).toString();
   }
 
+  /**
+   * IP validation
+   *
+   * @param ip e.g. 198.12.1.1
+   * @return
+   */
   public static Boolean ipv4Validation(String ip) {
 
     String[] tokens = ip != null ? ip.split("\\.") : null;
