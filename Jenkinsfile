@@ -2,7 +2,7 @@ def deploybleBranches = ["develop", "release", "master"]
 def dockerData = [:]
 
 def isDeployableBranch = {
-  deploybleBranches.contains(env.BRANCH_NAME)
+  deploybleBranches.find { env.BRANCH_NAME.contains(it) }
 }
 
 def getDockerData = {
@@ -14,7 +14,7 @@ def getDockerData = {
       version = "alpha-${pom.version}"
       namespace = "development"
       break
-    case "release": // staging
+    case ~/release(.*)/: // staging
       version = "betha-${pom.version}"
       namespace = "staging"
       break
