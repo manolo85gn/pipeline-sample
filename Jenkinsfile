@@ -1,6 +1,5 @@
 def deploybleBranches = ["develop", "release", "master"]
 def dockerData = [:]
-def imageTag = ""
 
 def isDeployableBranch = {
   deploybleBranches.contains(env.BRANCH_NAME)
@@ -9,35 +8,31 @@ def isDeployableBranch = {
 def getDockerData = {
   def version = ""
   def namespace = ""
-  def prefix = ""
   def pom = readMavenPom file: 'cidr-api/pom.xml'
   switch(env.BRANCH_NAME) {
     case "develop": // develop
-      version = "${pom.version}"
-      prefix = "alpha"
+      version = "alpha-${pom.version}"
       namespace = "development"
       break
     case "release": // staging
       version = "betha-${pom.version}"
-      prefix = "betha"
       namespace = "staging"
       break
     case "master": // production
       version = "${pom.version}"
-      prefix = ""
       namespace = "production"
       break
     default:
+      version = "${env.BRANCH_NAME.replaceAll("/", "_") {(?1: )match(?1: ->)
+
+      }}-${env.BUILD_NUMBER}"
       break
   }
 
-  [version: version, namespace: namespace, prefix: prefix]
+  [version: version, namespace: namespace]
 }
 
-env.BRANCH_NAME = "develop" // harcoded to test the deployment
-
 node {
-
   stage "Checkout"
   scm
 
@@ -49,20 +44,17 @@ node {
   stage "Build"
   dir('cidr_convert_api/java') {
     dockerData = getDockerData()
-    imageTag = "${dockerData.prefix}-${dockerData.version}"
-    sh "docker build -t cidr_convert:${imageTag} ."
+    sh "docker build -t cidr_convert:${dockerData.version} ."
   }
 
   if( isDeployableBranch() ) {
     stage "Push"
-    sh "docker tag cidr_convert:${imageTag} wizelinedevops/cidr_convert:${imageTag}"
-    sh "docker tag cidr_convert:${imageTag} wizelinedevops/cidr_convert:latest"
-    sh "docker push wizelinedevops/cidr_convert:${imageTag}"
-    sh "docker push wizelinedevops/cidr_convert:latest"
+    sh "docker tag cidr_convert:${dockerData.version} wizelinedevops/cidr_convert:${dockerData.version}"
+    sh "docker push wizelinedevops/cidr_convert:${dockerData.version}"
 
     stage "Deploy"
     withCredentials([file(credentialsId: 'k8s', variable: 'KUBECONFIG')]) {
-      sh "kubectl --kubeconfig=${env.KUBECONFIG} --namespace=${dockerData.namespace} set image deployment/api api=wizelinedevops/cidr_convert:${dockerData.prefix}-latest"
+      sh "kubectl --kubeconfig=${env.KUBECONFIG} --namespace=${dockerData.namespace} set image deployment/api api=wizelinedevops/cidr_convert:${dockerData.version}"
     }
   }
 }
