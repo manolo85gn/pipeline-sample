@@ -2,7 +2,7 @@ def deploybleBranches = ["develop", "release", "master"]
 def dockerData = [:]
 
 def isDeployableBranch = {
-  deploybleBranches.contains(env.BRANCH_NAME)
+  deploybleBranches.find { env.BRANCH_NAME.contains(it) }
 }
 
 def getDockerData = {
@@ -14,7 +14,7 @@ def getDockerData = {
       version = "alpha-${pom.version}"
       namespace = "development"
       break
-    case "release": // staging
+    case ~/release(.*)/: // staging
       version = "betha-${pom.version}"
       namespace = "staging"
       break
@@ -32,28 +32,34 @@ def getDockerData = {
 }
 
 node {
-  stage "Checkout"
-  scm
-
-  stage "Test"
-  dir('cidr_convert_api/java') {
-    sh 'docker run -v $(pwd)/cidr-api:/usr/local/cidr-api -w /usr/local/cidr-api maven:3-jdk-8-alpine mvn test'
+  stage("Checkout") {
+    checkout scm
   }
 
-  stage "Build"
-  dir('cidr_convert_api/java') {
-    dockerData = getDockerData()
-    sh "docker build -t cidr_convert:${dockerData.version} ."
+  stage("Test") {
+    dir('cidr_convert_api/java') {
+      echo "test is working"
+      sh 'docker run -v $(pwd)/cidr-api:/usr/local/cidr-api -w /usr/local/cidr-api maven:3-jdk-8-alpine mvn test'
+    }
+  }
+
+  stage("Build") {
+    dir('cidr_convert_api/java') {
+      dockerData = getDockerData()
+      sh "docker build -t cidr_convert:${dockerData.version} ."
+    }
   }
 
   if( isDeployableBranch() ) {
-    stage "Push"
-    sh "docker tag cidr_convert:${dockerData.version} wizelinedevops/cidr_convert:${dockerData.version}"
-    sh "docker push wizelinedevops/cidr_convert:${dockerData.version}"
+    stage("Push") {
+      sh "docker tag cidr_convert:${dockerData.version} wizelinedevops/cidr_convert:${dockerData.version}"
+      sh "docker push wizelinedevops/cidr_convert:${dockerData.version}"
+    }
 
-    stage "Deploy"
-    withCredentials([file(credentialsId: 'k8s', variable: 'KUBECONFIG')]) {
-      sh "kubectl --kubeconfig=${env.KUBECONFIG} --namespace=${dockerData.namespace} set image deployment/api api=wizelinedevops/cidr_convert:${dockerData.version}"
+    stage("Deploy") {
+      withCredentials([file(credentialsId: 'k8s', variable: 'KUBECONFIG')]) {
+        sh "kubectl --kubeconfig=${env.KUBECONFIG} --namespace=${dockerData.namespace} set image deployment/api api=wizelinedevops/cidr_convert:${dockerData.version}"
+      }
     }
   }
 }
