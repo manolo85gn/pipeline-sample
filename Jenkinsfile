@@ -42,8 +42,6 @@ node {
           key: 'before',
           value: '$.before',
           expressionType: 'JSONPath', //Optional, defaults to JSONPath
-          regexpFilter: '', //Optional, defaults to empty string
-          defaultValue: '' //Optional, defaults to empty string
          ]
         ],
         causeString: 'Triggered on $ref',
