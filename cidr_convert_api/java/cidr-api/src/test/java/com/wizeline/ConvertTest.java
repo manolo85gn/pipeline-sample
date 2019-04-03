@@ -1,5 +1,4 @@
 package com.wizeline;
-import static com.wizeline.Convert.*;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -73,4 +72,31 @@ public class ConvertTest extends TestCase
       assertFalse(Convert.ipv4Validation("255.256.250.0"));
       assertFalse(Convert.ipv4Validation("...."));
     }
+
+    public void testCidrToMaskLimits()
+    {
+        assertEquals("Invalid", Convert.cidrToMask(""));
+        assertEquals("Invalid", Convert.cidrToMask(null));
+        assertEquals("Invalid", Convert.cidrToMask("0.0"));
+        assertEquals("Invalid", Convert.cidrToMask("1.123"));
+    }
+
+    public void testMaskToCidrLimits()
+    {
+        assertEquals("Invalid", Convert.maskToCidr(""));
+        assertEquals("Invalid", Convert.maskToCidr(null));
+        assertEquals("Invalid", Convert.maskToCidr("12323!@#@!#!@#!@#!@#"));
+        assertEquals("Invalid", Convert.maskToCidr("@#@!#@!.@!#@!#!@.!@#!@#@!"));
+    }
+
+    public void testIpv4Limit()
+    {
+        assertFalse(Convert.ipv4Validation(""));
+        assertFalse(Convert.ipv4Validation(null));
+        assertFalse(Convert.ipv4Validation("255.256.250.0.21321.2123.123213"));
+        assertFalse(Convert.ipv4Validation("..........."));
+        assertFalse(Convert.ipv4Validation("21321321wewr#$%$#@$@#4"));
+        assertFalse(Convert.ipv4Validation("QQWQE>WEQWEQW.qweqwe.qweqweqw.123!@#!@#.123!@#!@"));
+    }
+
 }

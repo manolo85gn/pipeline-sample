@@ -32,6 +32,30 @@ def getDockerData = {
 }
 
 node {
+  withCredentials([string(credentialsId: 'webhookTokenWizeline', variable: 'webhookTokenWizeline')]) {
+    properties([
+      pipelineTriggers([
+       [$class: 'GenericTrigger',
+        genericVariables: [
+         [key: 'ref', value: '$.ref'],
+         [
+          key: 'before',
+          value: '$.before',
+          expressionType: 'JSONPath', //Optional, defaults to JSONPath
+         ]
+        ],
+        causeString: 'Triggered on $ref',
+        token: webhookTokenWizeline,
+        printContributedVariables: true,
+        printPostContent: true,
+        silentResponse: false,
+        regexpFilterText: '$ref',
+        regexpFilterExpression: 'refs/heads/' + BRANCH_NAME
+       ]
+      ])
+    ])
+  }
+
   stage("Checkout") {
     checkout scm
   }
