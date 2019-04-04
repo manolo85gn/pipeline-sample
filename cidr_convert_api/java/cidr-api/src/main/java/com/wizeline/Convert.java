@@ -154,7 +154,8 @@ public class Convert {
   }
 
   private static Boolean maskValidation(String input) {
-    return maskLengthValidation(input) && integerTokensValidation(input) && firstGreaterThanZero(input);
+    qqqq
+    return maskLengthValidation(input) && integerTokensValidation(input) && firstGreaterThanZero(input) && rangeValidation(input);
   }
 
   private static Boolean integerGreaterThanZero(String input) {
