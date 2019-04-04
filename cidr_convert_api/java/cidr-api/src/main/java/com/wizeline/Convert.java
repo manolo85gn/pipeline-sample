@@ -112,8 +112,17 @@ public class Convert {
   }
 
   private static Boolean rangeValidation(String token) {
-    Integer tokenAsInt = Integer.parseInt(token);
-    return tokenAsInt >= 0 && tokenAsInt <= 255;
+    String[] tokenArr = token.split("\\.");
+    boolean result = true;
+    for(int i=0; i <  tokenArr.length; i++) {
+      Integer tokenAsInt = Integer.parseInt(tokenArr[i]);
+      result = tokenAsInt >= 0 && tokenAsInt <= 255;
+      if(!result) {
+        break;
+      }
+    }
+
+    return result;
   }
 
   private static Boolean integerValidation(String token) {
@@ -154,7 +163,6 @@ public class Convert {
   }
 
   private static Boolean maskValidation(String input) {
-    qqqq
     return maskLengthValidation(input) && integerTokensValidation(input) && firstGreaterThanZero(input) && rangeValidation(input);
   }
 

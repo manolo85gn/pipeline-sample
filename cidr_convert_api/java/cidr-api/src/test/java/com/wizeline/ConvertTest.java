@@ -99,4 +99,8 @@ public class ConvertTest extends TestCase
         assertFalse(Convert.ipv4Validation("QQWQE>WEQWEQW.qweqwe.qweqweqw.123!@#!@#.123!@#!@"));
     }
 
+    public void testMaskRange() {
+        assertEquals("Invalid", Convert.maskToCidr("256.0.0.0"));
+    }
+
 }
